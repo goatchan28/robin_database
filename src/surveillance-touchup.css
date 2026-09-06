@@ -109,7 +109,7 @@ aside nav a#nav-upload::before, aside nav a#nav-database::before { content: none
 @keyframes upload-pulse { 50% { border-color: #9adaff; box-shadow: inset 0 0 24px #1581bf2c; } }
 
 /* The Add Images sidebar destination is separate from the upload dialog. */
-.image-intake-page { position: fixed; z-index: 19; left: 244px; top: 0; right: 0; bottom: 0; display: grid; place-items: center; padding: 34px; overflow-y: auto; background: #02070b; }
+.image-intake-page { position: fixed; z-index: 19; left: 244px; top: 0; right: 0; bottom: 0; display: grid; place-items: center; padding: 34px; overflow: hidden; background: #02070b; }
 .image-intake-card { width: min(900px, 100%); }
 .image-intake-card > label { color: #58a9df; font: 11px 'DM Mono', monospace; letter-spacing: 1.3px; }
 .image-intake-card > h2 { margin: 14px 0 18px; color: #e3f3fb; font-size: 32px; }
