@@ -213,9 +213,10 @@ def list_identities(
     if search.strip():
         params["display_name"] = f"ilike.*{search.strip()}*"
     items = rest_rows("identities", params=params)
+    has_more = len(items) == page_size
     identity_ids = [str(item["id"]) for item in items]
     if not identity_ids:
-        return {"items": [], "page": page, "page_size": page_size}
+        return {"items": [], "page": page, "page_size": page_size, "has_more": False}
     record_rows = rest_rows("criminal_records", params={
         "select": "id,identity_id,record_status,wanted_level,active_warrant,warrant_number,warrant_issue_date,arrest_count,conviction_count,primary_offense,last_arrest_date,created_at",
         "identity_id": f"in.({','.join(identity_ids)})", "order": "created_at.desc",
@@ -259,7 +260,7 @@ def list_identities(
         next((item for item in group if item["criminal_record_id"] is not None), group[0])
         for group in groups.values()
     ]
-    return {"items": items, "page": page, "page_size": page_size}
+    return {"items": items, "page": page, "page_size": page_size, "has_more": has_more}
 
 
 @app.get("/identities/{identity_id}")

@@ -17,8 +17,13 @@ async function request(path, options = {}) {
 }
 
 export async function loadRecords() {
-  const { items } = await request('/identities?status=active&page_size=100');
-  return items.map((identity) => {
+  const identities = [];
+  for (let page = 1; ; page += 1) {
+    const result = await request(`/identities?status=active&page_size=100&page=${page}`);
+    identities.push(...result.items);
+    if (!result.has_more) break;
+  }
+  return identities.map((identity) => {
     const criminal = identity.criminal_record;
     const cases = (criminal?.cases || []).map((item) => [
       displayDate(item.incident_date), item.case_number, item.offense,
