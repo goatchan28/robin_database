@@ -119,6 +119,7 @@ aside nav a#nav-upload::before, aside nav a#nav-database::before { content: none
 .image-intake-page section small { color: #829aa9; font: 10px 'DM Mono', monospace; line-height: 1.5; }
 .image-intake-page .confirm { margin-left: auto; white-space: nowrap; }
 .image-intake-page .intake-form { display: grid; max-width: 900px; gap: 20px; margin-top: 26px; padding: 34px; border: 1px solid #155179; background: #061522; }
+.image-intake-page .intake-form:has(.camera-box) { gap: 12px; margin-top: 16px; padding: 22px 34px; }
 .intake-names { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .intake-full-name { display: grid; gap: 7px; max-width: 100%; color: #78a9c8; font: 10px 'DM Mono', monospace; letter-spacing: 1px; }
 .intake-form > label { display: grid; gap: 7px; color: #78a9c8; font: 10px 'DM Mono', monospace; letter-spacing: 1px; }
@@ -137,8 +138,8 @@ aside nav a#nav-upload::before, aside nav a#nav-database::before { content: none
 .intake-previews img { width: 92px; height: 70px; border: 1px solid #4285a8; object-fit: cover; }
 .intake-previews figcaption { overflow: hidden; color: #87a5b5; font: 8px 'DM Mono', monospace; text-overflow: ellipsis; white-space: nowrap; }
 .remove-intake-image { position: absolute; top: 4px; right: 4px; display: grid; width: 19px; height: 19px; place-items: center; border: 1px solid #d67070; background: #210b0bdd; color: #ffd5d5; font-size: 15px; line-height: 1; }
-.camera-box { display: grid !important; gap: 12px; margin: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; }
-.camera-box video { width: 100%; height: auto; max-height: min(56vh, 520px); aspect-ratio: 4 / 3; background: #000; border: 1px solid #245b7d; object-fit: contain; }
+.camera-box { display: grid !important; gap: 8px; margin: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; }
+.camera-box video { width: min(100%, 480px); height: min(32vh, 300px); justify-self: center; aspect-ratio: 4 / 3; background: #000; border: 1px solid #245b7d; object-fit: contain; }
 .camera-box p { margin: 0; color: #8aa2af; font-size: 11px; }
 .camera-box > div { display: flex; justify-content: center; gap: 9px; }
 .camera-box .confirm { margin: 0; }
@@ -159,6 +160,8 @@ aside nav a#nav-upload::before, aside nav a#nav-database::before { content: none
   .image-intake-page { left: 0; top: 0; padding: 86px 20px 30px; place-items: start center; }
   .image-intake-page .confirm { margin-left: 60px; }
   .image-intake-page .intake-form { padding: 19px; }
+  .image-intake-page .intake-form:has(.camera-box) { padding: 16px 19px; }
+  .camera-box video { height: min(28vh, 230px); }
   .image-intake-page .intake-submit { margin-left: 0; }
   .intake-names { grid-template-columns: 1fr; }
   .intake-complete header { display: grid; }
