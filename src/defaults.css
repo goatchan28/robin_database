@@ -1,0 +1,10 @@
+/* Required system defaults: black, police blue, plain industrial lettering. */
+:root { --system-black: #000000; --system-blue: #004A8A; }
+body, .layout, aside, main > header, .table, .record, .stats > div, .archive, .uploader { background-color: var(--system-black); }
+body, button, input, select { font-family: Arial, Helvetica, sans-serif; font-weight: 600; }
+.brand b, .title h1, .database-title h2, .labels, .record-banner, .case-history, .profile-tabs button, .case-row, .subject-details, .stats label { font-family: Arial, Helvetica, sans-serif; font-weight: 700; letter-spacing: .055em; }
+aside, main > header, .stats > div, .table, .record, .archive, .uploader, .search, .tools > div > button, .filter > button { border-color: var(--system-blue); }
+aside nav .sel, .record:hover, .record:focus { box-shadow: inset 3px 0 var(--system-blue); }
+.primary, .add-small, .confirm, .featured mark, .u-head > div { background: var(--system-blue); border-color: #3e82bd; }
+.criminal-record { background: #f1f1ed; }
+.record-banner { background: #000000; }

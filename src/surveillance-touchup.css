@@ -1,0 +1,147 @@
+/* Style cues from the reference: blue system signage, black monitor panels, restrained live signals. */
+:root { --monitor-blue: #004A8A; --monitor-green: #72e33d; --monitor-line: #06385e; }
+
+body { background: #000; }
+.layout { background: #000; background-image: linear-gradient(180deg, #03080d 0, #000 18rem); }
+
+aside { background: #000; border-right: 2px solid var(--monitor-line); }
+.brand { border-bottom-color: #0c304a; }
+.brand mark.brand-mark { width: 58px; height: 58px; padding: 0; overflow: hidden; border: 1px solid var(--monitor-blue); background: #fff; }
+.brand-mark img { width: 100%; height: 100%; display: block; object-fit: contain; object-position: center; transform: none; }
+.brand b { color: #e8eef2; letter-spacing: .12em; }
+aside nav .sel { background: #061521; box-shadow: inset 3px 0 var(--monitor-blue); }
+aside nav .sel::after { content: 'ACTIVE'; margin-left: auto; color: var(--monitor-green); font-size: 8px; letter-spacing: .06em; }
+aside nav .sel span { display: none; }
+aside nav a { border-bottom: 1px solid #092133; border-radius: 0; }
+aside nav a:not(.sel) { color: #b0bcc1; }
+aside footer { border-top-color: #0c304a; }
+
+main > header { height: 58px; background: #03070a; border-bottom-color: #0c304a; }
+.crumb { color: #a9b5ba; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; }
+.crumb strong { color: #eef4f7; }
+
+.content { padding-top: 33px; }
+.title { position: relative; padding: 19px 0 25px; border-bottom: 1px solid #0b385a; }
+.title::before { content: 'ROBIN INTELLIGENCE DATABASE // SECURE TERMINAL'; position: absolute; top: 0; color: #8d989d; font-size: 8px; letter-spacing: .1em; }
+.title > div > label { display: none; }
+.title h1 { color: var(--monitor-blue); font-size: clamp(28px, 2.6vw, 39px); line-height: 1; text-shadow: 0 0 14px #0066bd3c; }
+.title p { margin-top: 10px; color: #a5afb4; }
+.primary { border-width: 2px; border-color: var(--monitor-blue); background: #020d14; color: #eaf7ff; }
+.primary:hover { background: #063258; }
+
+.stats { gap: 8px; margin-top: 19px; }
+.stats > div { position: relative; min-height: 112px; border: 1px solid #0d3b5d; background: #010508; }
+.stats > div::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--monitor-blue); opacity: .75; }
+.stats .featured { background: linear-gradient(120deg, #031320, #010508 65%); }
+.featured mark { border-color: var(--monitor-blue); color: var(--monitor-blue); background: #020e16; }
+.stats label { color: #a7b1b6; }.stats b { color: #f1f4f5; }.stats p { color: #aab4b9; }
+.stats p i { background: var(--monitor-green); box-shadow: 0 0 7px #72e33d99; }
+.storage > span i { background: var(--monitor-blue); }
+
+.database-title { border-left: 3px solid var(--monitor-blue); padding-left: 11px; }
+.database-title h2 { color: var(--monitor-blue); text-transform: uppercase; letter-spacing: .02em; }
+.database-title p, .database-title > span { color: #a7b0b4; }
+.search, .tools > div > button, .filter > button { background: #010508; border-color: #10517b; }
+.search:focus-within { border-color: var(--monitor-blue); box-shadow: inset 0 0 0 1px var(--monitor-blue); }
+.table { border-color: #10517b; background: #000; }
+.labels { height: 42px; color: var(--monitor-blue); background: #010508; border-bottom-color: #10517b; }
+.record { background: #000; border-bottom-color: #092d47; }
+.record:hover, .record:focus { background: #03111b; box-shadow: inset 4px 0 var(--monitor-blue); }
+.portrait { border-color: #10517b; }
+.person h3 { color: #f1f5f6; }.person p, .inventory p, .import p, .class p { color: #a5afb3; }
+.badge { background: #031a29; border-color: var(--monitor-blue); color: #def4ff; }
+.badge.review { background: #151408; border-color: #b68b21; color: #f2d481; }
+.threat span { color: var(--monitor-green); text-shadow: 0 0 8px #72e33d55; }
+
+/* Keep long UUIDs and record descriptions inside their grid cells. */
+.record > * { min-width: 0; }
+.person > div:last-child, .inventory > div:last-child { min-width: 0; }
+.person h3, .person p, .inventory b, .inventory p, .import b, .import p, .class p {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Robin deployment: one focused database workspace. */
+.brand b { font-size: 0; }
+.brand b::after { content: 'ROBIN'; font-size: 15px; }
+.brand small { font-size: 0; }
+.brand small::after { content: 'INTELLIGENCE DATABASE'; font-size: 8px; }
+aside nav a:not(.sel) { display: none; }
+aside nav .sel { font-size: 0; }
+aside nav .sel::before { content: 'DATABASE'; font-size: 11px; }
+aside nav .sel::after { display: none; }
+aside nav a#nav-upload, aside nav a#nav-database { display: flex; font-size: 11px; cursor: pointer; }
+aside nav a#nav-upload::before, aside nav a#nav-database::before { content: none; }
+.stats { grid-template-columns: 1.35fr 1fr 1.35fr; }
+.stats > :nth-child(3) { display: none; }
+.title h1 { font-size: 0; }
+.title h1::after { content: 'Robin Intelligence Database'; font-size: clamp(28px, 2.6vw, 39px); }
+.crumb { font-size: 0; }
+.crumb::after { content: 'ROBIN INTELLIGENCE DATABASE  /  PERSON ARCHIVES'; font-size: 10px; }
+.crumb b, .crumb strong { display: none; }
+
+.archive, .uploader { border-color: var(--monitor-blue); background: #000; }
+.archive-head, .tabs { background: #010508; border-color: #0e456c; }
+.profile-tabs button.active { border-bottom-color: var(--monitor-blue); color: #d9f2ff; }
+.gallery { background: #000; }.asset > div { border-color: #10517b; }
+
+@media (max-width: 740px) {
+  .title::before { font-size: 7px; }
+  .title { padding-top: 17px; }
+}
+
+.auth-shade { z-index: 100; }
+.auth-box { max-width: 430px; }
+.auth-box form { display: grid; gap: 15px; }
+.auth-box .select-label { color: #aebbc1; }
+.auth-box input { width: 100%; margin-top: 7px; padding: 11px; color: #f3fbff; background: #000; border: 1px solid #1d628e; border-radius: 0; outline: 0; }
+.auth-box input:focus { border-color: var(--monitor-blue); box-shadow: inset 0 0 0 1px var(--monitor-blue); }
+.auth-submit { width: 100%; justify-content: center; margin-top: 7px; }
+.auth-error { margin: 0; color: #f1bd82; font-size: 10px; line-height: 1.5; }
+
+/* Upload feedback should make the submitted state unmistakable. */
+.drop.uploading { border-style: solid; border-color: #56aee0; background: #0c2940; animation: upload-pulse 1.1s ease-in-out infinite; }
+.uploader button:disabled, .uploader select:disabled { cursor: not-allowed; opacity: .6; }
+.upload-toast { position: fixed; z-index: 40; right: 28px; bottom: 26px; max-width: min(390px, calc(100vw - 36px)); padding: 13px 16px; border: 1px solid #2c84b9; background: #061b2b; color: #d8f3ff; box-shadow: 0 12px 34px #000b; font: 12px 'DM Mono', monospace; }
+.upload-toast::before { content: '✓'; margin-right: 9px; color: #6be2a3; font-weight: 700; }
+@keyframes upload-pulse { 50% { border-color: #9adaff; box-shadow: inset 0 0 24px #1581bf2c; } }
+
+/* The Add Images sidebar destination is separate from the upload dialog. */
+.image-intake-page { position: fixed; z-index: 19; left: 244px; top: 70px; right: 0; bottom: 0; display: grid; place-items: center; padding: 34px; overflow-y: auto; background: #02070b; }
+.image-intake-card { width: min(720px, 100%); }
+.image-intake-card > label { color: #58a9df; font: 11px 'DM Mono', monospace; letter-spacing: 1.3px; }
+.image-intake-card > h2 { margin: 11px 0 7px; color: #e3f3fb; font-size: 29px; }
+.image-intake-card > p { max-width: 580px; margin: 0; color: #92a5b1; font-size: 13px; line-height: 1.65; }
+.image-intake-page section { display: grid; gap: 5px; min-width: 0; }
+.image-intake-page section b { color: #d8edf7; font-size: 14px; }
+.image-intake-page section small { color: #829aa9; font: 10px 'DM Mono', monospace; line-height: 1.5; }
+.image-intake-page .confirm { margin-left: auto; white-space: nowrap; }
+.image-intake-page .intake-form { display: grid; max-width: 720px; margin-top: 30px; padding: 26px; border: 1px solid #155179; background: #061522; }
+.intake-form > label { display: grid; gap: 7px; color: #78a9c8; font: 10px 'DM Mono', monospace; letter-spacing: 1px; }
+.intake-form input { width: 100%; border: 1px solid #245b7d; background: #020a10; color: #e8f7ff; padding: 11px; font-size: 13px; outline: 0; }
+.intake-form input:focus { border-color: #5bbbe9; }
+.image-intake-page .intake-methods { display: flex; gap: 9px; margin-top: 8px; }
+.intake-methods button, .camera-box button { border: 1px solid #245b7d; background: #06131d; color: #9ecae4; padding: 10px 12px; font-size: 11px; }
+.intake-methods button.active { border-color: #4daddd; background: #10324b; color: #def5ff; }
+.intake-drop { min-height: 170px; margin-top: 0; border: 1px dashed #3b7296; background: #071827; display: flex !important; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #62b5e9; padding: 20px; font-size: 28px; }
+.intake-drop b { margin-top: 8px; color: #d3e9f5; font-size: 12px; }
+.intake-drop span { margin-top: 5px; color: #829ba9; font-size: 10px; }
+.intake-drop em { margin-top: 12px; color: #8ccff0; font-size: 11px; font-style: normal; font-weight: 700; }
+.camera-box { display: grid !important; gap: 12px; margin: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; }
+.camera-box video { width: 100%; max-height: 340px; background: #000; border: 1px solid #245b7d; object-fit: cover; }
+.camera-box p { margin: 0; color: #8aa2af; font-size: 11px; }
+.camera-box > div { display: flex; gap: 9px; }
+.camera-box .confirm { margin-left: 0; }
+.intake-summary { margin: 0 !important; padding: 10px 12px !important; border: 1px solid #153e59 !important; background: #04101a !important; color: #91b8cd; font: 10px 'DM Mono', monospace; line-height: 1.5; }
+.image-intake-page .intake-submit { justify-self: end; margin-left: 0; }
+.intake-complete { display: grid; gap: 12px; max-width: 620px; margin-top: 30px; padding: 28px; border: 1px solid #287c64; background: #061c19; }
+.intake-complete b { color: #78e2af; font-size: 15px; }
+.intake-complete p { margin: 0; color: #b7d5cb; font-size: 12px; line-height: 1.6; }
+.intake-complete .confirm { justify-self: start; margin-left: 0; }
+@media (max-width: 740px) {
+  .image-intake-page { left: 0; top: 62px; padding: 30px 20px; place-items: start center; }
+  .image-intake-page .confirm { margin-left: 60px; }
+  .image-intake-page .intake-form { padding: 19px; }
+  .image-intake-page .intake-submit { margin-left: 0; }
+}

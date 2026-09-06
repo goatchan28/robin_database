@@ -1,0 +1,30 @@
+/* Readability pass for operational tables and records. */
+.database-title h2 { font-size: 18px; }
+.database-title p, .database-title > span { font-size: 11px; }
+
+.labels { height: 40px; font-size: 9px; }
+.record { min-height: 102px; }
+.person h3 { font-size: 14px; margin-bottom: 6px; }
+.person p, .inventory p, .import p, .class p { font-size: 10px; }
+.inventory b, .import b { font-size: 12px; margin-bottom: 6px; }
+.badge { font-size: 9px; padding: 5px 7px; }
+.threat small { font-size: 9px; }
+
+.criminal-record { padding: 30px 36px 36px; }
+.record-banner { min-height: 39px; font-size: 10px; }
+.subject-details label, .case-history label { font-size: 9px; }
+.subject-details b { margin-top: 7px; font-size: 13px; }
+.subject-details > div { min-height: 63px; padding: 11px 13px; }
+.case-history h3 { font-size: 15px; }
+.case-history header > span { font-size: 9px; }
+.case-labels { height: 34px; font-size: 8px; }
+.case-row { min-height: 52px; font-size: 11px; }
+.case-row time, .case-row b { font-size: 10px; }
+.case-row em { font-size: 8px; padding: 4px 5px; }
+.empty-cases { margin: 0; padding: 22px 13px; border-bottom: 1px solid #9aa39f; color: #59615e; font-size: 10px; letter-spacing: .08em; }
+.case-history footer { font-size: 8px; padding: 11px 13px; }
+
+@media (max-width: 740px) {
+  .criminal-record { padding: 17px; }
+  .person h3 { font-size: 13px; }
+}

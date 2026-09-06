@@ -1,0 +1,97 @@
+/* Traditional case-file treatment inside the profile window. */
+.profile-tabs {
+  padding: 0 32px;
+  gap: 0;
+  min-height: 45px;
+}
+
+.profile-tabs button {
+  height: 45px;
+  padding: 0 17px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.profile-tabs button + button { border-left: 1px solid #344852; }
+.profile-tabs button.active { border-bottom: 2px solid #d7e1e4; color: #f0f4f5; }
+.profile-tabs button span { color: #73c8e7; margin-left: 5px; }
+
+.criminal-record {
+  background: #e7e9e7;
+  color: #13191c;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  padding: 25px 32px 32px;
+}
+
+.record-banner {
+  min-height: 34px;
+  background: #111719;
+  color: #f4f4ef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 9px;
+  letter-spacing: .09em;
+}
+
+.record-banner b { color: #d9dedc; font-weight: 500; }
+
+.subject-sheet {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 20px;
+  padding: 19px 0;
+  border-bottom: 2px solid #172023;
+}
+
+.mugshot {
+  height: 148px;
+  position: relative;
+  border: 1px solid #172023;
+  background: #b9c0bd;
+  overflow: hidden;
+}
+
+.mugshot img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 25%;
+  filter: grayscale(1) contrast(1.15);
+}
+
+.mugshot span {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 5px 6px; background: #111719e8; color: #e6e9e6;
+  font-size: 7px; letter-spacing: .08em;
+}
+
+.subject-details { display: grid; grid-template-columns: repeat(3, 1fr); align-content: start; border-left: 1px solid #939c98; }
+.subject-details > div { min-height: 56px; padding: 9px 12px; border-right: 1px solid #939c98; border-bottom: 1px solid #939c98; }
+.subject-details > div:nth-last-child(-n+3) { border-bottom: 0; }
+.subject-details label, .case-history label { color: #50605e; font-size: 8px; letter-spacing: .08em; }
+.subject-details b { display: block; margin-top: 6px; font-size: 11px; font-weight: 500; color: #0b1113; }
+.subject-details .case-threat { color: #7f571e; letter-spacing: 1px; }
+.case-threat small { color: #394442; font-size: 8px; letter-spacing: 0; }
+
+.case-history { margin-top: 24px; border: 1px solid #172023; }
+.case-history header { display: flex; justify-content: space-between; align-items: end; padding: 13px 14px 11px; border-bottom: 2px solid #172023; }
+.case-history h3 { margin: 4px 0 0; font-size: 13px; font-weight: 500; text-transform: uppercase; }
+.case-history header > span { font-size: 8px; color: #43514e; }
+.case-labels, .case-row { display: grid; grid-template-columns: 1fr 1fr 1.65fr 1.2fr .95fr; gap: 11px; padding: 0 13px; align-items: center; }
+.case-labels { height: 30px; background: #c8ceca; border-bottom: 1px solid #172023; color: #43514e; font-size: 7px; letter-spacing: .07em; }
+.case-row { min-height: 46px; border-bottom: 1px solid #9aa39f; font-size: 9px; }
+.case-row time, .case-row b { font-size: 9px; font-weight: 500; }
+.case-row strong { font-weight: 500; text-transform: uppercase; }
+.case-row span { color: #40504d; }
+.case-row em { justify-self: start; color: #1e4138; border: 1px solid #557369; padding: 3px 4px; font-style: normal; font-size: 7px; text-transform: uppercase; }
+.case-row em.warrant { color: #6d2b20; border-color: #8a544a; font-weight: 500; }
+.case-history footer { padding: 9px 13px; background: #c8ceca; color: #43514e; font-size: 7px; letter-spacing: .07em; }
+.case-history footer span { float: right; }
+
+@media (max-width: 740px) {
+  .profile-tabs { padding: 0 15px; }
+  .criminal-record { padding: 15px; overflow-x: auto; }
+  .record-banner { min-width: 620px; }
+  .subject-sheet { min-width: 620px; grid-template-columns: 112px 1fr; }
+  .case-history { min-width: 620px; }
+  .archive { max-width: 96vw; }
+}

@@ -1,0 +1,44 @@
+/* Image database refinements: explicit review and right-aligned threat rating. */
+.labels,
+.record {
+  grid-template-columns: 1.35fr 1.25fr .9fr 1fr .72fr;
+}
+
+.threat {
+  justify-self: center;
+  min-width: 90px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.threat span {
+  display: block;
+  color: #e7b768;
+  font-size: 29px;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.labels span:last-child {
+  text-align: center;
+}
+
+.threat small {
+  color: #71879c;
+  font: 8px 'DM Mono', monospace;
+  letter-spacing: .4px;
+}
+
+@media (max-width: 1060px) {
+  .labels,
+  .record {
+    grid-template-columns: 1.25fr 1.2fr .85fr .7fr;
+  }
+
+  .class { display: none; }
+}
+
+@media (max-width: 740px) {
+  .record { grid-template-columns: 1fr auto; }
+  .threat { min-width: 76px; }
+}
