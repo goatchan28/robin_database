@@ -42,8 +42,10 @@ SUPABASE_SERVICE_ROLE_KEY=...
 server-only service key for database REST requests and private Storage. A
 Supabase personal access token is not used by this app.
 
-New image sets are stored in `identity-images/<external_ref>/`, where
-`external_ref` is the identity's lowercase, no-space enrollment reference.
+New image sets are stored in `identity-images/<first_last>/`, using the
+identity display name normalized to lowercase with underscores. For example,
+`Manas Chan` is stored in `identity-images/manas_chan/`. This is independent
+of `external_ref`, which remains a legacy identity reference for other tools.
 
 ## Routes
 

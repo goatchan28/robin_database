@@ -355,6 +355,20 @@ def image_stem(display_name: str) -> str:
     return "_".join(re.sub(r"[^A-Za-z0-9]", "", part) for part in display_name.split())
 
 
+def image_folder(display_name: str) -> str:
+    """Return the Storage folder convention for an enrolled identity.
+
+    ``external_ref`` remains a legacy identity reference.  Storage paths are
+    intentionally derived from the visible name so ``Manas Chan`` is always
+    enrolled beneath ``manas_chan``.
+    """
+    parts = [re.sub(r"[^a-z0-9]", "", part.lower()) for part in display_name.split()]
+    parts = [part for part in parts if part]
+    if len(parts) < 2:
+        raise HTTPException(status_code=422, detail="Identity display name must contain a first and last name")
+    return "_".join(parts)
+
+
 def next_image_paths(folder: str, display_name: str, uploads: list[UploadFile]) -> list[str]:
     stem = image_stem(display_name)
     existing_rows = rest_rows("identity_images", params={
@@ -377,9 +391,7 @@ def next_image_paths(folder: str, display_name: str, uploads: list[UploadFile]) 
 
 
 async def write_image_set(identity: dict[str, Any], uploads: list[UploadFile], link_status: str = "active") -> list[dict[str, Any]]:
-    folder = identity.get("external_ref")
-    if not folder or not re.fullmatch(r"[a-z0-9]+", folder):
-        raise HTTPException(status_code=422, detail="Identity external_ref must be lowercase letters and numbers only")
+    folder = image_folder(identity["display_name"])
     uploaded_paths: list[str] = []
     prepared: list[tuple[str, UploadFile, bytes, str]] = []
     try:

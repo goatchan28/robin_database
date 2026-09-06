@@ -5,3 +5,5 @@ api/.env
 api/.venv/
 api/**/__pycache__/
 *.pyc
+.vercel
+.env*
