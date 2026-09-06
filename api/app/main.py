@@ -332,6 +332,17 @@ def clean_name_part(value: str, label: str) -> str:
     return cleaned
 
 
+def split_full_name(value: str) -> tuple[str, str, str]:
+    cleaned = " ".join(value.strip().split())
+    if not re.fullmatch(r"[A-Za-z][A-Za-z' -]{1,159}", cleaned):
+        raise HTTPException(status_code=422, detail="Full name must contain letters, spaces, apostrophes, or hyphens only")
+    parts = cleaned.split(" ")
+    if len(parts) < 2:
+        raise HTTPException(status_code=422, detail="Enter a first and last name")
+    normalized = " ".join(part.title() for part in parts)
+    return normalized.split(" ", 1)[0], normalized.split(" ", 1)[1], normalized
+
+
 def image_extension(content_type: str) -> str:
     extensions = {
         "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp",
@@ -413,15 +424,12 @@ async def create_image_set(
 
 @app.post("/identity-intake", status_code=status.HTTP_201_CREATED)
 async def intake_identity_images(
-    first_name: Annotated[str, Form()],
-    last_name: Annotated[str, Form()],
+    full_name: Annotated[str, Form()],
     uploads: Annotated[list[UploadFile], File(alias="files")],
 ) -> dict[str, Any]:
     if not uploads:
         raise HTTPException(status_code=400, detail="At least one image is required")
-    first = clean_name_part(first_name, "First name")
-    last = clean_name_part(last_name, "Last name")
-    display_name = f"{first} {last}"
+    _, _, display_name = split_full_name(full_name)
     external_ref = re.sub(r"[^a-z0-9]", "", display_name.lower())
     matches = rest_rows("identities", params={
         "select": "id,display_name,external_ref,status", "status": "eq.active", "display_name": f"ilike.{display_name}",
@@ -450,5 +458,7 @@ async def intake_identity_images(
 # the Vite bundle as well as the local API from http://127.0.0.1:8082.
 # API routes are registered above this catch-all static mount.
 FRONTEND_DIST = Path(__file__).resolve().parents[2] / "dist"
-if FRONTEND_DIST.is_dir():
+# Vercel serves the Vite build from its CDN. Keeping this mount local-only
+# avoids a catch-all static route taking over the serverless API function.
+if FRONTEND_DIST.is_dir() and not os.getenv("VERCEL"):
     app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="frontend")

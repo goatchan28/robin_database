@@ -1,4 +1,6 @@
-const baseUrl = import.meta.env.VITE_LOCAL_API_URL || 'http://127.0.0.1:8082';
+// Local development uses FastAPI directly. Deployed builds use the same
+// origin, where Vercel routes `/api/*` to the server-side FastAPI function.
+const baseUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://127.0.0.1:8082' : '/api');
 
 const placeholder = (name) => `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="240" height="280"><rect width="100%" height="100%" fill="#09131a"/><circle cx="120" cy="93" r="48" fill="#315263"/><path d="M35 260c11-62 51-92 85-92s74 30 85 92" fill="#315263"/><text x="120" y="272" text-anchor="middle" font-family="Arial" font-size="12" fill="#a8c3ce">${name.slice(0, 18).toUpperCase()}</text></svg>`)}`;
 const displayDate = (value) => value ? new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(value)) : '—';
@@ -87,10 +89,9 @@ export async function uploadImageSet(identityId, files) {
   return request(`/identities/${identityId}/image-sets`, { method: 'POST', body: formData });
 }
 
-export async function intakeIdentityImages(firstName, lastName, files) {
+export async function intakeIdentityImages(fullName, files) {
   const formData = new FormData();
-  formData.append('first_name', firstName);
-  formData.append('last_name', lastName);
+  formData.append('full_name', fullName);
   files.forEach((file) => formData.append('files', file));
   return request('/identity-intake', { method: 'POST', body: formData });
 }
