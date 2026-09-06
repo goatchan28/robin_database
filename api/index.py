@@ -23,5 +23,5 @@ async def strip_vercel_api_prefix(request: Request, call_next):
     return await call_next(request)
 
 
-# Vercel requires this to be the FastAPI instance, not a generic ASGI wrapper.
+# Keep the exported object as FastAPI so Vercel discovers this Python function.
 app = robin_app
