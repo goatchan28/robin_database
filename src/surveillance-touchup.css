@@ -140,8 +140,8 @@ aside nav a#nav-upload::before, aside nav a#nav-database::before { content: none
 .camera-box { display: grid !important; gap: 12px; margin: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; }
 .camera-box video { width: 100%; height: auto; max-height: min(56vh, 520px); aspect-ratio: 4 / 3; background: #000; border: 1px solid #245b7d; object-fit: contain; }
 .camera-box p { margin: 0; color: #8aa2af; font-size: 11px; }
-.camera-box > div { display: flex; gap: 9px; }
-.camera-box .confirm { margin-left: 0; }
+.camera-box > div { display: flex; justify-content: center; gap: 9px; }
+.camera-box .confirm { margin: 0; }
 .intake-summary { margin: 0 !important; padding: 10px 12px !important; border: 1px solid #153e59 !important; background: #04101a !important; color: #91b8cd; font: 10px 'DM Mono', monospace; line-height: 1.5; }
 .image-intake-page .intake-submit { justify-self: end; margin-left: 0; }
 .intake-complete { display: grid; gap: 17px; width: min(760px, 100%); margin-top: 30px; padding: 28px; border: 1px solid #287c64; background: #061c19; }
