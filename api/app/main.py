@@ -7,6 +7,7 @@ import logging
 import os
 import re
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -163,6 +164,33 @@ def signed_url(bucket: str, path: str) -> str:
     return relative_url if relative_url.startswith("http") else f"{settings().supabase_url}/storage/v1{relative_url}"
 
 
+def signed_urls(bucket: str, paths: list[str]) -> dict[str, str]:
+    """Create links concurrently so a gallery does not wait per image."""
+    if not paths:
+        return {}
+    with ThreadPoolExecutor(max_workers=min(8, len(paths))) as executor:
+        urls = executor.map(lambda path: signed_url(bucket, path), paths)
+        return dict(zip(paths, urls, strict=True))
+
+
+def storage_folder_objects(folder: str) -> list[dict[str, Any]]:
+    """Return direct image objects stored beneath an identity's folder."""
+    try:
+        response = httpx.post(
+            f"{settings().supabase_url}/storage/v1/object/list/{IDENTITY_BUCKET}",
+            headers=supabase_headers(),
+            json={"prefix": folder, "limit": 1000, "offset": 0, "sortBy": {"column": "name", "order": "asc"}},
+            timeout=20,
+        )
+        response.raise_for_status()
+    except httpx.HTTPError as error:
+        raise HTTPException(status_code=502, detail="Unable to list identity images") from error
+    return [
+        row for row in response.json()
+        if row.get("name") and row.get("name") != ".emptyFolderPlaceholder" and row.get("metadata") is not None
+    ]
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -245,18 +273,37 @@ def get_identity(identity_id: uuid.UUID) -> dict[str, Any]:
 
 @app.get("/identities/{identity_id}/images")
 def get_identity_images(identity_id: uuid.UUID) -> dict[str, Any]:
-    first_item(rest_rows("identities", params={"select": "id", "id": f"eq.{identity_id}"}), "Identity not found")
+    identity = first_item(
+        rest_rows("identities", params={"select": "id,display_name", "id": f"eq.{identity_id}"}),
+        "Identity not found",
+    )
     links = rest_rows("identity_image_links", params={
         "select": "status,identity_images(id,storage_bucket,storage_path,content_type,created_at,width,height,face_rect)",
         "identity_id": f"eq.{identity_id}", "order": "created_at.desc",
     })
-    images = [link["identity_images"] for link in links if (link.get("status") or "active").lower() == "active" and link.get("identity_images")]
-    return {"items": [
-        {"id": row["id"], "content_type": row["content_type"], "created_at": row["created_at"],
-         "width": row["width"], "height": row["height"], "face_rect": row["face_rect"],
-         "signed_url": signed_url(row["storage_bucket"], row["storage_path"])}
-        for row in images
-    ]}
+    linked_images = [
+        link["identity_images"] for link in links
+        if (link.get("status") or "active").lower() == "active" and link.get("identity_images")
+    ]
+    linked_by_path = {row["storage_path"]: row for row in linked_images}
+    folder = image_folder(identity["display_name"])
+    storage_images = storage_folder_objects(folder)
+    rows: list[dict[str, Any]] = []
+    for storage_row in storage_images:
+        path = f"{folder}/{storage_row['name']}"
+        metadata = linked_by_path.get(path)
+        object_metadata = storage_row.get("metadata") or {}
+        rows.append({
+            "id": metadata["id"] if metadata else storage_row.get("id") or f"storage:{path}",
+            "storage_path": path,
+            "content_type": (metadata or {}).get("content_type") or object_metadata.get("mimetype") or "image/*",
+            "created_at": (metadata or {}).get("created_at") or storage_row.get("created_at") or storage_row.get("updated_at"),
+            "width": (metadata or {}).get("width"),
+            "height": (metadata or {}).get("height"),
+            "face_rect": (metadata or {}).get("face_rect"),
+        })
+    urls = signed_urls(IDENTITY_BUCKET, [row["storage_path"] for row in rows])
+    return {"items": [{**row, "signed_url": urls[row.pop("storage_path")]} for row in rows]}
 
 
 @app.get("/identities/{identity_id}/criminal-record")
