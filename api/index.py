@@ -1,30 +1,27 @@
 """Vercel entry point for the Robin FastAPI service.
 
-Vercel sends this function requests beneath `/api`. The application itself is
-shared with local Uvicorn development and intentionally declares routes such
-as `/identities`, so this wrapper removes only that deployment prefix.
+Vercel looks specifically for a ``FastAPI`` instance named ``app`` and passes
+the full ``/api/...`` path to it.  The shared local app intentionally exposes
+routes such as ``/identities``; this lightweight middleware removes only that
+deployment prefix before FastAPI resolves the route.
 """
 
 from __future__ import annotations
 
-from typing import Any
-
 from app.main import app as robin_app
+from fastapi import Request
 
 
-class StripApiPrefix:
-    def __init__(self, application: Any) -> None:
-        self.application = application
-
-    async def __call__(self, scope: dict[str, Any], receive: Any, send: Any) -> None:
-        if scope["type"] in {"http", "websocket"} and scope.get("path", "").startswith("/api"):
-            scope = dict(scope)
-            path = scope["path"][4:] or "/"
-            scope["path"] = path
-            raw_path = scope.get("raw_path")
-            if raw_path:
-                scope["raw_path"] = path.encode()
-        await self.application(scope, receive, send)
+@robin_app.middleware("http")
+async def strip_vercel_api_prefix(request: Request, call_next):
+    path = request.scope.get("path", "")
+    if path == "/api" or path.startswith("/api/"):
+        stripped_path = path[4:] or "/"
+        request.scope["path"] = stripped_path
+        if request.scope.get("raw_path"):
+            request.scope["raw_path"] = stripped_path.encode()
+    return await call_next(request)
 
 
-app = StripApiPrefix(robin_app)
+# Vercel requires this to be the FastAPI instance, not a generic ASGI wrapper.
+app = robin_app
