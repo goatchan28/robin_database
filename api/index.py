@@ -8,7 +8,9 @@ deployment prefix before FastAPI resolves the route.
 
 from __future__ import annotations
 
-from app.main import app as robin_app
+# Vercel imports this module from the repository root, while local Uvicorn
+# imports it from within ``api``.  The package-qualified path works in both.
+from api.app.main import app as robin_app
 from fastapi import Request
 
 
