@@ -30,7 +30,7 @@ const sexes = ['M','F','M','F','M','F'];
 const files = photos.map(([id,name,district,status,count,updated,image], index) => ({ id,name,district,status,count,updated,image,age:ages[index],sex:sexes[index],threat:[5,3,4,2,2,3][index],cases:caseHistory[index],assets:Array.from({length:8},(_,i)=>({id:`${id}-IMG-${String(i+1).padStart(3,'0')}`,image,type:i%3?'REFERENCE':'FIELD INTAKE',date:i<2?updated:'Aug 28, 2026'})) }));
 
 let records=files, current=null, profileTab='record', filter='All records', searchQuery='', upload=false, imagePage=true, target=files[0].id, pendingFiles=[], uploading=false, toast='';
-let intakeMode='computer', intakeFiles=[], intakeFullName='', intakeSubmitting=false, intakeSuccess='', intakeGallery=[], cameraStream=null;
+let intakeMode='computer', intakeFiles=[], intakeFullName='', intakeSubmitting=false, intakeSuccess='', intakeGallery=[], cameraStream=null, cameraStarting=null;
 let dataError='';
 const app=document.querySelector('#app');
 const I={search:'⌕',upload:'↑',images:'▧',people:'♙',folder:'□',db:'◫',chev:'⌄',close:'×',arrow:'→',filter:'≡',bell:'◌'};
@@ -53,11 +53,14 @@ function render(){const count=records.reduce((n,r)=>n+r.count,0), query=searchQu
 function closeUpload(){if(uploading)return;upload=false;pendingFiles=[];render()}
 function stopCamera(){if(cameraStream){cameraStream.getTracks().forEach(track=>track.stop());cameraStream=null;}}
 async function attachCameraPreview(){const video=document.querySelector('#camera-preview');if(video&&cameraStream){video.srcObject=cameraStream;await video.play();if(video.videoWidth&&video.videoHeight)video.style.aspectRatio=`${video.videoWidth} / ${video.videoHeight}`;}}
-async function startCamera(){try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});await attachCameraPreview();const capture=document.querySelector('#capture-camera');if(capture)capture.disabled=false;}catch(error){cameraStream=null;window.alert('Unable to access the Mac camera. Check your browser camera permission and try again.');}}
+async function startCamera(){if(cameraStream){await attachCameraPreview();return;}if(cameraStarting)return cameraStarting;cameraStarting=(async()=>{try{const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});if(!imagePage||intakeMode!=='camera'||intakeSuccess){stream.getTracks().forEach(track=>track.stop());return;}cameraStream=stream;await attachCameraPreview();const capture=document.querySelector('#capture-camera');if(capture)capture.disabled=false;}catch(error){cameraStream=null;window.alert('Unable to access the Mac camera. Check your browser camera permission and try again.');}finally{cameraStarting=null;}})();return cameraStarting;}
 function captureCamera(){const video=document.querySelector('#camera-preview');if(!video?.videoWidth){window.alert('The camera is not ready yet.');return;}const canvas=document.createElement('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext('2d').drawImage(video,0,0);canvas.toBlob(blob=>{if(!blob)return;intakeFiles=[...intakeFiles,new File([blob],`${normalizedIntakeName().replace(/\s+/g,'_')||'First_Last'}.jpg`,{type:'image/jpeg'})];render();attachCameraPreview();},'image/jpeg',.92);}
 async function populateGallery(identityId){const assets=await loadIdentityImages(identityId);const record=records.find(item=>item.id===identityId);if(record){record.assets=assets;record.count=assets.length;}return assets;}
 function bind(){
   if(dataError){document.querySelector('#modal').innerHTML=connectionBox();document.querySelector('#retry-connection').addEventListener('click',initialize);return;}
+  // Camera mode owns the stream: returning to this page, capturing an image,
+  // or resetting the intake should never leave a blank "Starting" preview.
+  if(imagePage&&intakeMode==='camera'&&!intakeSuccess&&!intakeSubmitting)void startCamera();
   document.querySelector('#nav-upload')?.addEventListener('click',()=>{if(uploading)return;current=null;upload=false;imagePage=true;intakeSuccess='';render()});
   document.querySelector('#nav-database')?.addEventListener('click',()=>{if(uploading)return;stopCamera();upload=false;imagePage=false;pendingFiles=[];current=null;render()});
   document.querySelectorAll('.record').forEach(el=>{el.onclick=()=>openRecord(el.dataset.id);el.onkeydown=e=>{if(e.key==='Enter')el.click()}});
@@ -72,7 +75,7 @@ function bind(){
   document.querySelector('#confirm')?.addEventListener('click',async()=>{if(uploading)return;const selectedTarget=target,fileCount=pendingFiles.length,selectedRecord=records.find(record=>record.id===selectedTarget);uploading=true;render();try{await uploadImageSet(selectedTarget,pendingFiles);await refreshRecords(selectedTarget);await populateGallery(selectedTarget);current=selectedTarget;target=selectedTarget;profileTab='images';upload=false;imagePage=false;uploading=false;pendingFiles=[];toast=`${fileCount} image${fileCount===1?'':'s'} added to ${selectedRecord?.name||'record'}.`;render();window.setTimeout(()=>{if(toast){toast='';render()}},4000);}catch(error){uploading=false;render();window.alert(error.message||'Image upload failed.');}});
   document.querySelector('#intake-full-name')?.addEventListener('input',event=>{intakeFullName=event.target.value;const submit=document.querySelector('#submit-intake');if(submit)submit.disabled=!(intakeFiles.length&&normalizedIntakeName().split(' ').length>1)});
   document.querySelector('#method-computer')?.addEventListener('click',()=>{stopCamera();intakeMode='computer';render()});
-  document.querySelector('#method-camera')?.addEventListener('click',async()=>{intakeMode='camera';render();await startCamera()});
+  document.querySelector('#method-camera')?.addEventListener('click',()=>{intakeMode='camera';render()});
   document.querySelector('#intake-files')?.addEventListener('change',event=>{intakeFiles=[...intakeFiles,...event.target.files];render()});
   const dropZone=document.querySelector('#intake-drop');
   dropZone?.addEventListener('dragover',event=>{event.preventDefault();dropZone.classList.add('dragging')});
