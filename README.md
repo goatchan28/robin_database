@@ -1,20 +1,89 @@
 # Robin Intelligence Database
 
-Local team interface for enrolling identity images into the shared Robin Supabase project and viewing the associated person records. It is intended for a private development/hackathon environment.
+A facial-recognition database built for Robin, an AI-powered police bodycam identification system developed at DNHacks.
 
-## Can a teammate use it?
+Robin uses a live iPhone camera feed to detect faces, identify potential matches using Clearview AI, and retrieve associated records from Supabase. This repository contains the database management interface that allows our team to add individuals, upload reference photos, and manage the identity records used by the main system.
 
-Yes. Each teammate runs a local copy of the app and API, but all copies write to the same Supabase project. A normal setup takes about 3–5 minutes after Node.js and Python are already installed.
+**The goal is simple:** Upload a person's photo, associate it with their identity, and make that information available to Robin's facial-recognition and records-retrieval pipeline.
 
-The local API is required because it holds the server-only Supabase secret and performs Storage uploads. Do **not** put that key in frontend files, browser code, screenshots, or commits.
+This is a hackathon prototype using synthetic law-enforcement records, not a production police database.
 
-## One-time setup
+---
 
-Requirements:
+## How It Works
 
-- Node.js 20+ (Node 22 is known to work)
-- Python 3.11+ (Python 3.13 is known to work)
-- Access to the team Supabase project’s server-side key
+The database serves as the connection between facial recognition and the information associated with an identified individual.
+
+```text
+       Robin Intelligence Database
+                  |
+                  v
+         Add a New Individual
+                  |
+                  v
+       Upload Reference Photos
+       (Computer or Mac Camera)
+                  |
+                  v
+       Store Images in Supabase
+                  |
+                  v
+       Link Photos to Identity
+                  |
+                  v
+        Available to Robin
+```
+
+When Robin identifies someone through its live camera feed, the main application uses Clearview AI embeddings to search for matching identities in Supabase and retrieve associated synthetic records.
+
+### Database Management Interface
+
+The web interface allows teammates to:
+
+1. **Add Individuals:** Enter a person's first and last name to create an identity record.
+2. **Upload Photos:** Add reference images directly from a computer or capture them using a Mac camera.
+3. **Manage Existing Identities:** Automatically associate new photos with an existing individual when their name matches.
+4. **View Records:** Access the identity records stored in the shared Supabase database.
+
+All teammates connect to the same Supabase project, so uploaded identities and images are available across the team.
+
+---
+
+## Technologies
+
+- **Supabase:** PostgreSQL database and private image storage
+- **Python & FastAPI:** Backend API for database operations and image uploads
+- **React & TypeScript:** Web-based database management interface
+- **Node.js:** Frontend development and build tooling
+
+### Integration with Robin
+
+This repository handles identity enrollment and database management.
+
+The main Robin application handles:
+
+- Live video streaming from an iPhone to a Mac
+- Real-time face detection using OpenCV
+- Facial embedding generation through Clearview AI
+- Identity matching through Supabase
+- Retrieval of synthetic law-enforcement records
+- Live identification results and audit logging
+
+The two applications use the same Supabase project, allowing identities enrolled through this interface to be used by Robin's recognition pipeline after the necessary embeddings have been generated.
+
+---
+
+## Getting Started
+
+Each teammate runs the interface locally while connecting to the shared Supabase database.
+
+### Requirements
+
+- Node.js 20+
+- Python 3.11+
+- Access to the team's Supabase project
+
+### 1. Install Dependencies
 
 From the project root:
 
@@ -26,70 +95,151 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Create `api/.env` locally. This file is ignored by Git and must never be shared in source control:
+### 2. Configure Supabase
+
+Create a file named `api/.env`:
 
 ```dotenv
 SUPABASE_URL=https://<your-project-ref>.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=<server-only Supabase secret key>
 ```
 
-Get both values from Supabase Dashboard → **Project Settings** → **API**. Use the server-only secret key for the local API—not the database password, personal access token, or browser-facing anon key.
+Find these values in:
 
-## Run the app
+**Supabase Dashboard → Project Settings → API**
 
-Build the frontend once, then serve both the UI and API from one terminal:
+Use the server-side secret key, not the public anonymous key or database password.
+
+**Important:** Never commit your `.env` file or expose the Supabase service key in frontend code. The key provides privileged access to the database and must remain private.
+
+### 3. Run the Application
+
+From the project root:
 
 ```bash
-cd /path/to/frontend_seastreet
 npm run build
 cd api
 source .venv/bin/activate
 uvicorn app.main:app --host 127.0.0.1 --port 8082
 ```
 
-Open [http://127.0.0.1:8082](http://127.0.0.1:8082).
+Open:
 
-After any frontend change, run `npm run build` again and refresh the browser. After an API change, stop Uvicorn with `Ctrl+C` and run the Uvicorn command again.
+**http://127.0.0.1:8082**
 
-## Enrolling images
+The application serves both the frontend interface and the backend API locally.
 
-The app opens on **Add Image**.
+After modifying the frontend, run `npm run build` again. After modifying the API, restart Uvicorn.
 
-1. Enter first and last name.
-2. Choose **Upload from computer** or **Use Mac camera**.
-3. Submit the image(s).
+---
 
-If an active identity with the exact same name exists, the files are attached to it. Otherwise, the API creates an active identity. Files are stored in the private `identity-images` bucket under the canonical lowercase/no-space identity folder, for example:
+## Adding Individuals and Photos
+
+The application opens on the **Add Image** page.
+
+1. Enter the individual's first and last name.
+2. Select **Upload from computer** or **Use Mac camera**.
+3. Choose or capture the reference images.
+4. Submit the images to Supabase.
+
+If an active identity with the same name already exists, the new photos are linked to that individual.
+
+Otherwise, the system creates a new identity.
+
+### Image Storage
+
+Reference photos are stored in the private Supabase Storage bucket `identity-images`.
+
+For example:
 
 ```text
-identity-images/manaschan/Manas_Chan.jpg
-identity-images/manaschan/Manas_Chan_02.jpg
+identity-images/
+└── manaschan/
+    ├── Manas_Chan.jpg
+    └── Manas_Chan_02.jpg
 ```
 
-The first upload of a file type uses `First_Last.format`; later same-type images receive a numeric suffix to avoid overwriting existing evidence.
+Images are organized by identity, and additional photos receive numbered filenames to prevent existing files from being overwritten.
 
-## Important team rules
+The main Robin application can subsequently process these images to generate facial embeddings and associate them with the corresponding identities.
 
-- Keep `api/.env`, `.env.local`, and `.venv/` private. They are already ignored.
-- Do not run `scripts/reconcile-image-storage.mjs`; it was a one-time data-repair tool, not part of normal setup.
-- Do not use the Supabase database password or service secret in Vite/browser code.
-- This API intentionally binds only to `127.0.0.1`. A teammate must run their own local instance; it is not a shared public server.
-- The current API uses a server-only key with broad project access. Treat it as private team tooling only.
+---
+
+## How the Database Connects to Facial Recognition
+
+The full Robin identification workflow operates as follows:
+
+```text
+       iPhone Live Camera
+                |
+                v
+       OpenCV Face Detection
+                |
+                v
+      Clearview AI Embedding
+                |
+                v
+      Supabase Vector Search
+                |
+                v
+       Potential Identity Match
+                |
+                v
+       Associated Person Record
+                |
+                v
+      Synthetic Records Lookup
+                |
+                v
+       Robin Interface & Logs
+```
+
+This database provides the stored identities, reference images, and associated records used by that workflow.
+
+The database management interface itself does not perform live facial recognition. Recognition and embedding generation are handled by the main Robin application.
+
+---
+
+## Important Notes
+
+- This application is intended for private development and hackathon demonstrations.
+- All teammates connect to the same Supabase project.
+- The API runs locally on `127.0.0.1:8082` and is not publicly accessible by default.
+- Supabase credentials must remain in `api/.env`.
+- Do not expose server-side credentials in React, Vite, or browser code.
+- Do not run `scripts/reconcile-image-storage.mjs`; it was created for a one-time data repair.
+- The current backend uses a privileged Supabase key and is not designed for public deployment.
+
+---
 
 ## Troubleshooting
 
-**`Database unavailable` or `502` in the app**
+### Database unavailable or 502 error
 
-- Confirm `api/.env` has the correct URL and server-only secret key.
-- Restart Uvicorn after editing `api/.env`.
-- Make sure the browser is opened at `http://127.0.0.1:8082`, not the Vite dev port.
+1. Confirm that `api/.env` contains the correct Supabase URL and secret key.
+2. Restart Uvicorn after changing environment variables.
+3. Open the application at `http://127.0.0.1:8082`, not the Vite development port.
 
-**`esbuild` or `rollup` platform error on Apple Silicon**
+### Node.js build errors on Apple Silicon
 
-Dependencies were likely installed under a different architecture/Rosetta mode. From the project root, delete only `node_modules` and `package-lock.json`, then run `npm install` with a native ARM Node installation.
+If `esbuild` or `rollup` reports an architecture mismatch, dependencies may have been installed under Rosetta or a different Node.js architecture.
 
-**Mac camera does not start**
+From the project root, remove `node_modules` and `package-lock.json`, then reinstall dependencies using a native ARM version of Node.js:
 
-- Use `http://127.0.0.1:8082`.
-- Allow the browser camera permission when prompted.
-- Close any other app using the camera, then try again.
+```bash
+npm install
+```
+
+### Mac camera not working
+
+- Open the application at `http://127.0.0.1:8082`.
+- Allow camera access when prompted by your browser.
+- Close other applications that may be using the camera.
+
+---
+
+## Project Context
+
+Robin was developed during DNHacks as a prototype for integrating computer vision, facial recognition, and law-enforcement records retrieval into a live bodycam workflow.
+
+This repository focuses specifically on the **identity database and image enrollment system**, providing the infrastructure needed to store reference images, organize identities, and support the main application's recognition pipeline.
